@@ -6,7 +6,6 @@ import SimulationControls from './components/SimulationControls';
 import ObservationSection from './components/ObservationSection';
 import EducationalTimeline from './components/EducationalTimeline';
 import ComparisonTable from './components/ComparisonTable';
-import Footer from './components/Footer';
 import { windAudio } from './utils/audio';
 
 export default function App() {
@@ -132,14 +131,14 @@ export default function App() {
         bladeRPM={bladeRPM}
       />
 
-      {/* Main Container */}
-      <main className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 py-3 sm:py-4 space-y-8 sm:space-y-10">
+      {/* Main Container - compact bottom padding, no extra empty gap */}
+      <main className="relative z-10 max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-4 space-y-6 sm:space-y-8 pb-6">
         
-        {/* HERO SECTION: Fits in same viewport
+        {/* HERO SECTION: Fits in same viewport on desktop, cleanly stacks on mobile
                    animation
           readings   |   controls
         */}
-        <section className="flex flex-col gap-3 min-h-[calc(100vh-5.5rem)] justify-center">
+        <section className="flex flex-col gap-2.5 sm:gap-3 lg:min-h-[calc(100vh-5.5rem)] justify-center">
           {/* Top: Animation */}
           <div className="w-full">
             <WindmillCanvas
@@ -151,7 +150,7 @@ export default function App() {
           </div>
 
           {/* Bottom: Readings (Left) | Controls (Right) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 w-full">
             <div className="h-full">
               <TelemetryPanel
                 windSpeed={windSpeed}
@@ -188,9 +187,6 @@ export default function App() {
         {/* Section 4B: Comparison Table */}
         <ComparisonTable />
       </main>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

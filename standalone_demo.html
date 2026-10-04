@@ -100,19 +100,24 @@
   <div class="fixed inset-0 pointer-events-none bg-[#8eb5a8]/40 dark:bg-[#131d10]/75 backdrop-blur-[1px]"></div>
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#fefae0]/85 dark:bg-[#1b2612]/90 border-b border-[#7a9a3b]/20 transition-colors">
-    <div class="max-w-5xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between gap-3">
-      <div>
-        <h1 class="text-sm sm:text-base font-bold text-[#233217] dark:text-[#fefae0]">Meadow Windmill</h1>
-        <p class="text-[10px] text-[#557327] dark:text-[#a5c9be] hidden sm:block">Interactive Wind Simulation</p>
+  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#fefae0]/90 dark:bg-[#1b2612]/95 border-b border-[#7a9a3b]/20 transition-colors">
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+      <div class="w-full sm:w-auto flex items-center justify-between gap-3">
+        <div>
+          <h1 class="text-sm sm:text-base font-bold text-[#233217] dark:text-[#fefae0]">Meadow Windmill</h1>
+          <p class="text-[10px] text-[#557327] dark:text-[#a5c9be] hidden sm:block">Interactive Wind Simulation</p>
+        </div>
+        <button id="theme-btn-mobile" onclick="toggleTheme()" class="sm:hidden p-1.5 rounded-lg border border-[#7a9a3b]/30 bg-[#fefae0] dark:bg-[#233217] text-[#3d5225] dark:text-[#fefae0]">
+          <i data-lucide="moon" class="w-4 h-4 text-[#557327]"></i>
+        </button>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-mono text-[#3d5225] dark:text-[#d2e2c5] bg-[#f4f8d3]/80 dark:bg-[#28381c]/80 px-3 py-1 rounded-full border border-[#7a9a3b]/20">
+      <div class="flex items-center gap-2 text-xs font-mono text-[#3d5225] dark:text-[#d2e2c5] bg-[#f4f8d3] dark:bg-[#28381c] px-3 py-1 rounded-full border border-[#7a9a3b]/25 shadow-xs">
         <span id="engine-status-dot" class="w-2 h-2 rounded-full bg-[#7a9a3b]"></span>
         <span id="header-readout">60 km/h • 80 RPM</span>
       </div>
 
-      <button id="theme-btn" class="p-1.5 rounded-lg border border-[#7a9a3b]/30 bg-[#fefae0] dark:bg-[#233217] text-[#3d5225] dark:text-[#fefae0]">
+      <button id="theme-btn" onclick="toggleTheme()" class="hidden sm:block p-1.5 rounded-lg border border-[#7a9a3b]/30 bg-[#fefae0] dark:bg-[#233217] text-[#3d5225] dark:text-[#fefae0]">
         <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-[#557327]"></i>
       </button>
     </div>
