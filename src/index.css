@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: #8eb5a8;
+  }
+}
+
+/* Background image overlay */
+.art-bg-wallpaper {
+  background-image: url('/bg-art.png');
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Art Style Bento Card: Warm Frosted Canvas / Parchment */
+.bento-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border-width: 1.5px;
+  transition: all 0.25s ease-out;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background-color: rgba(254, 250, 224, 0.88);
+  border-color: rgba(122, 154, 59, 0.25);
+  box-shadow: 0 10px 25px -4px rgba(35, 50, 23, 0.08), 0 2px 6px -1px rgba(35, 50, 23, 0.03);
+}
+
+.bento-card:hover {
+  border-color: rgba(122, 154, 59, 0.45);
+}
+
+.dark .bento-card {
+  background-color: rgba(23, 34, 20, 0.88);
+  border-color: rgba(144, 179, 72, 0.22);
+  box-shadow: 0 12px 30px -6px rgba(10, 16, 8, 0.5), 0 2px 6px -1px rgba(144, 179, 72, 0.1);
+}
+
+.dark .bento-card:hover {
+  border-color: rgba(144, 179, 72, 0.4);
+}
+
+/* Custom Natural Range Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #d8e5c8;
+}
+
+.dark input[type="range"]::-webkit-slider-runnable-track {
+  background: #2b3d22;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #7a9a3b;
+  border: 2.5px solid #fefae0;
+  box-shadow: 0 2px 6px rgba(35, 50, 23, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.dark input[type="range"]::-webkit-slider-thumb {
+  background: #90b348;
+  border: 2.5px solid #172214;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #d8e5c8;
+}
+
+.dark input[type="range"]::-moz-range-track {
+  background: #2b3d22;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #7a9a3b;
+  border: 2.5px solid #fefae0;
+  box-shadow: 0 2px 6px rgba(35, 50, 23, 0.25);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(122, 154, 59, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 154, 59, 0.6);
+}

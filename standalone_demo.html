@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Meadow Windmill | Interactive Simulation</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            meadow: {
+              sky: '#8eb5a8',
+              cloud: '#fefae0',
+              grass: '#7a9a3b',
+              'grass-dark': '#557327',
+              hill: '#3d5225',
+              deep: '#233217',
+            }
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      background-color: #8eb5a8;
+      background-image: url('public/bg-art.png');
+      background-position: center bottom;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+    }
+    .bento-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.25rem;
+      border-width: 1.5px;
+      transition: all 0.25s ease-out;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background-color: rgba(254, 250, 224, 0.88);
+      border-color: rgba(122, 154, 59, 0.25);
+      box-shadow: 0 8px 20px -4px rgba(35, 50, 23, 0.08);
+    }
+    .dark .bento-card {
+      background-color: rgba(23, 34, 20, 0.88);
+      border-color: rgba(144, 179, 72, 0.22);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+      width: 100%;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 9999px;
+      background: #d8e5c8;
+    }
+    .dark input[type="range"]::-webkit-slider-runnable-track {
+      background: #2b3d22;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      margin-top: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #7a9a3b;
+      border: 2.5px solid #fefae0;
+      box-shadow: 0 2px 6px rgba(35, 50, 23, 0.25);
+    }
+    .dark input[type="range"]::-webkit-slider-thumb {
+      background: #90b348;
+      border: 2.5px solid #172214;
+    }
+  </style>
+</head>
+<body class="text-[#24331d] min-h-screen transition-colors duration-300">
+
+  <div class="fixed inset-0 pointer-events-none bg-[#8eb5a8]/40 dark:bg-[#131d10]/75 backdrop-blur-[1px]"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#fefae0]/85 dark:bg-[#1b2612]/90 border-b border-[#7a9a3b]/20 transition-colors">
+    <div class="max-w-5xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between gap-3">
+      <div>
+        <h1 class="text-sm sm:text-base font-bold text-[#233217] dark:text-[#fefae0]">Meadow Windmill</h1>
+        <p class="text-[10px] text-[#557327] dark:text-[#a5c9be] hidden sm:block">Interactive Wind Simulation</p>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs font-mono text-[#3d5225] dark:text-[#d2e2c5] bg-[#f4f8d3]/80 dark:bg-[#28381c]/80 px-3 py-1 rounded-full border border-[#7a9a3b]/20">
+        <span id="engine-status-dot" class="w-2 h-2 rounded-full bg-[#7a9a3b]"></span>
+        <span id="header-readout">60 km/h • 80 RPM</span>
+      </div>
+
+      <button id="theme-btn" class="p-1.5 rounded-lg border border-[#7a9a3b]/30 bg-[#fefae0] dark:bg-[#233217] text-[#3d5225] dark:text-[#fefae0]">
+        <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-[#557327]"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main viewport layout -->
+  <main class="relative z-10 max-w-5xl mx-auto px-3 sm:px-4 py-2 sm:py-3 space-y-8">
+    
+    <!-- HERO SECTION (All within same viewport) -->
+    <section class="flex flex-col gap-2.5 min-h-[calc(100vh-4.5rem)] justify-center">
+      
+      <!-- TOP: Animation -->
+      <div class="bento-card p-3 sm:p-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 rounded-lg bg-[#7a9a3b]/15 text-[#557327] dark:text-[#a5c9be]">
+              <i data-lucide="wind" class="w-4 h-4"></i>
+            </div>
+            <h2 class="text-xs sm:text-sm font-bold text-[#233217] dark:text-[#fefae0]">Windmill in the Meadow</h2>
+          </div>
+          <div class="text-[11px] font-mono text-[#557327] dark:text-[#a5c9be]">
+            Turn: <strong id="stat-duration" class="text-[#233217] dark:text-[#fefae0]">0.75s</strong>
+          </div>
+        </div>
+
+        <div class="relative w-full h-[200px] sm:h-[240px] md:h-[260px] rounded-xl overflow-hidden bg-gradient-to-b from-[#8eb5a8] via-[#a0c5b8] to-[#92b7aa] border border-[#7a9a3b]/25 shadow-inner flex items-center justify-center">
+          <svg id="windmill-svg" viewBox="0 0 400 320" class="w-full h-full max-h-[260px] overflow-visible">
+            <defs>
+              <linearGradient id="millTowerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f4ede2" />
+                <stop offset="45%" stop-color="#fdfbf7" />
+                <stop offset="100%" stop-color="#dfd5c4" />
+              </linearGradient>
+              <linearGradient id="millRoofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#b56743" />
+                <stop offset="100%" stop-color="#874323" />
+              </linearGradient>
+              <linearGradient id="millSailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fdfcf5" />
+                <stop offset="60%" stop-color="#f5efe0" />
+                <stop offset="100%" stop-color="#e3d8be" />
+              </linearGradient>
+            </defs>
+
+            <!-- Rolling Green Hill -->
+            <path d="M -20 250 Q 140 210 420 245 L 420 330 L -20 330 Z" fill="#7a9a3b" />
+            <path d="M -20 280 Q 180 250 420 285 L 420 330 L -20 330 Z" fill="#557327" />
+
+            <!-- Flowers -->
+            <circle cx="85" cy="265" r="2.5" fill="#fefae0" />
+            <circle cx="285" cy="270" r="2.5" fill="#fefae0" />
+
+            <!-- Base & Tower -->
+            <ellipse cx="200" cy="285" rx="34" ry="10" fill="#586c47" />
+            <polygon points="188,135 212,135 224,282 176,282" fill="url(#millTowerGrad)" stroke="#655b4b" stroke-width="1.5" />
+            <path d="M 185 185 L 215 185" stroke="#877561" stroke-width="1.5" />
+            <path d="M 181 235 L 219 235" stroke="#877561" stroke-width="1.5" />
+            <rect x="195" y="195" width="10" height="15" rx="4" fill="#3d5225" stroke="#877561" stroke-width="0.8" />
+            <path d="M 195 282 L 195 258 Q 200 252 205 258 L 205 282 Z" fill="#6d4c38" stroke="#483325" stroke-width="1" />
+
+            <!-- Roof -->
+            <path d="M 180,135 Q 200,112 220,135 Z" fill="url(#millRoofGrad)" stroke="#5c2d17" stroke-width="1.5" />
+
+            <!-- Rotating Rotor -->
+            <g id="blades-group" style="transform-origin: 200px 125px;">
+              <!-- 4 Sails -->
+              <g transform="rotate(0 200 125)">
+                <line x1="200" y1="125" x2="200" y2="29" stroke="#573e27" stroke-width="3.2" stroke-linecap="round" />
+                <path d="M 202.5 107 L 217 103 L 214 33 L 202.5 31 Z" fill="url(#millSailGrad)" stroke="#7c6953" stroke-width="1.2" />
+                <line x1="202.5" y1="91" x2="216" y2="89" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="75" x2="215" y2="73" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="59" x2="214.5" y2="57" stroke="#7c6953" stroke-width="0.8" />
+              </g>
+
+              <g transform="rotate(90 200 125)">
+                <line x1="200" y1="125" x2="200" y2="29" stroke="#573e27" stroke-width="3.2" stroke-linecap="round" />
+                <path d="M 202.5 107 L 217 103 L 214 33 L 202.5 31 Z" fill="url(#millSailGrad)" stroke="#7c6953" stroke-width="1.2" />
+                <line x1="202.5" y1="91" x2="216" y2="89" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="75" x2="215" y2="73" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="59" x2="214.5" y2="57" stroke="#7c6953" stroke-width="0.8" />
+              </g>
+
+              <g transform="rotate(180 200 125)">
+                <line x1="200" y1="125" x2="200" y2="29" stroke="#573e27" stroke-width="3.2" stroke-linecap="round" />
+                <path d="M 202.5 107 L 217 103 L 214 33 L 202.5 31 Z" fill="url(#millSailGrad)" stroke="#7c6953" stroke-width="1.2" />
+                <line x1="202.5" y1="91" x2="216" y2="89" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="75" x2="215" y2="73" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="59" x2="214.5" y2="57" stroke="#7c6953" stroke-width="0.8" />
+              </g>
+
+              <g transform="rotate(270 200 125)">
+                <line x1="200" y1="125" x2="200" y2="29" stroke="#573e27" stroke-width="3.2" stroke-linecap="round" />
+                <path d="M 202.5 107 L 217 103 L 214 33 L 202.5 31 Z" fill="url(#millSailGrad)" stroke="#7c6953" stroke-width="1.2" />
+                <line x1="202.5" y1="91" x2="216" y2="89" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="75" x2="215" y2="73" stroke="#7c6953" stroke-width="0.8" />
+                <line x1="202.5" y1="59" x2="214.5" y2="57" stroke="#7c6953" stroke-width="0.8" />
+              </g>
+
+              <circle cx="200" cy="125" r="10" fill="#573e27" stroke="#3a2717" stroke-width="2" />
+              <circle cx="200" cy="125" r="4.5" fill="#c27d48" />
+              <circle cx="200" cy="125" r="1.5" fill="#fefae0" />
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- BOTTOM: Readings (Left) | Controls (Right) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 w-full">
+        
+        <!-- Readings Card -->
+        <div class="bento-card p-3 sm:p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="gauge" class="w-4 h-4 text-[#7a9a3b]"></i>
+              <h3 class="text-xs sm:text-sm font-bold text-[#233217] dark:text-[#fefae0]">Live Readings</h3>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#f4f8d3] text-[#3d5225]">Active</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 my-auto">
+            <div class="p-2 sm:p-2.5 rounded-xl bg-[#f4f8d3]/50 dark:bg-[#1b2612]/70 border border-[#7a9a3b]/20">
+              <div class="text-[11px] text-[#557327] font-medium flex justify-between">
+                <span>Wind Speed</span>
+                <span class="font-mono" id="speed-pct">60%</span>
+              </div>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span id="readout-windspeed" class="text-2xl sm:text-3xl font-extrabold font-mono text-[#233217] dark:text-[#fefae0]">60</span>
+                <span class="text-xs font-mono text-[#557327]">km/h</span>
+              </div>
+              <div class="w-full bg-[#d8e5c8] rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="bar-windspeed" class="bg-[#7a9a3b] h-full rounded-full w-[60%]"></div>
+              </div>
+            </div>
+
+            <div class="p-2 sm:p-2.5 rounded-xl bg-[#f4f8d3]/50 dark:bg-[#1b2612]/70 border border-[#7a9a3b]/20">
+              <div class="text-[11px] text-[#557327] font-medium flex justify-between">
+                <span>Blade Speed</span>
+                <span class="font-mono" id="rpm-level">Normal</span>
+              </div>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span id="readout-bladerpm" class="text-2xl sm:text-3xl font-extrabold font-mono text-[#7a9a3b]">80</span>
+                <span class="text-xs font-mono text-[#557327]">RPM</span>
+              </div>
+              <div class="w-full bg-[#d8e5c8] rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="bar-bladerpm" class="bg-[#90b348] h-full rounded-full w-[60%]"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <div class="p-2 rounded-xl bg-[#fefae0]/70 dark:bg-[#172214]/70 border border-[#7a9a3b]/15">
+              <div class="text-[10px] uppercase font-mono text-[#557327]">Condition</div>
+              <div id="condition-title" class="text-xs font-bold text-[#233217] dark:text-[#fefae0] truncate">Steady Wind</div>
+            </div>
+            <div class="p-2 rounded-xl bg-[#fefae0]/70 dark:bg-[#172214]/70 border border-[#7a9a3b]/15">
+              <div class="text-[10px] uppercase font-mono text-[#557327]">Movement</div>
+              <div id="motion-title" class="text-xs font-bold text-[#233217] dark:text-[#fefae0] truncate">Smooth Spin</div>
+            </div>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-[#7a9a3b]/20 flex items-center justify-between text-xs">
+            <span class="text-[#557327] text-[11px]">Power Generated:</span>
+            <span class="font-mono font-bold text-[#233217] dark:text-[#fefae0]"><span id="stat-power">740</span> kW</span>
+          </div>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="bento-card p-3 sm:p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="sliders" class="w-4 h-4 text-[#7a9a3b]"></i>
+              <h3 class="text-xs sm:text-sm font-bold text-[#233217] dark:text-[#fefae0]">Wind Controls</h3>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#f4f8d3] text-[#3d5225]">Manual</span>
+          </div>
+
+          <div class="my-auto py-1">
+            <div class="flex items-center justify-between mb-1">
+              <label for="speed-slider" class="text-xs font-semibold text-[#233217] dark:text-[#fefae0]">Velocity</label>
+              <div class="flex items-center gap-1">
+                <input id="speed-input" type="number" min="0" max="100" value="60" class="w-12 px-1 py-0.5 text-center text-xs font-mono font-bold rounded-md bg-[#fefae0] dark:bg-[#1b2612] border border-[#7a9a3b]/30">
+                <span class="text-[11px] font-mono text-[#557327]">km/h</span>
+              </div>
+            </div>
+            <input id="speed-slider" type="range" min="0" max="100" step="1" value="60" class="w-full">
+            <div class="flex justify-between text-[10px] font-mono text-[#557327] mt-1">
+              <span>0 (Calm)</span>
+              <span>50 km/h</span>
+              <span>100 (Gale)</span>
+            </div>
+          </div>
+
+          <div class="mt-2 grid grid-cols-4 gap-1.5">
+            <button onclick="setPreset(0)" class="preset-btn py-1 px-1 rounded-xl text-center border transition-all" data-value="0">
+              <div class="text-[11px]">Calm</div>
+              <div class="text-[9px] font-mono text-stone-400">0 km/h</div>
+            </button>
+            <button onclick="setPreset(25)" class="preset-btn py-1 px-1 rounded-xl text-center border transition-all" data-value="25">
+              <div class="text-[11px]">Breeze</div>
+              <div class="text-[9px] font-mono text-stone-400">25 km/h</div>
+            </button>
+            <button onclick="setPreset(60)" class="preset-btn py-1 px-1 rounded-xl text-center border transition-all bg-[#7a9a3b] text-[#fefae0] border-[#7a9a3b] shadow-sm font-semibold" data-value="60">
+              <div class="text-[11px]">Windy</div>
+              <div class="text-[9px] font-mono text-[#fefae0]/80">60 km/h</div>
+            </button>
+            <button onclick="setPreset(90)" class="preset-btn py-1 px-1 rounded-xl text-center border transition-all" data-value="90">
+              <div class="text-[11px]">Gale</div>
+              <div class="text-[9px] font-mono text-stone-400">90 km/h</div>
+            </button>
+          </div>
+
+          <div class="mt-2.5 pt-2 border-t border-[#7a9a3b]/20">
+            <div class="grid grid-cols-3 gap-1.5">
+              <button id="btn-start" onclick="toggleSim(true)" class="flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#7a9a3b]/20 text-[#557327] border border-[#7a9a3b]/30">
+                <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                <span>Start</span>
+              </button>
+              <button id="btn-stop" onclick="toggleSim(false)" class="flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#b56743] hover:bg-[#9e5533] text-white shadow-sm">
+                <i data-lucide="square" class="w-3 h-3 fill-current"></i>
+                <span>Stop</span>
+              </button>
+              <button onclick="resetSimulation()" class="flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#f4f8d3]/80 border border-[#7a9a3b]/20 text-[#3d5225]">
+                <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+
+            <button onclick="recordObservation()" class="w-full mt-1.5 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#557327] text-[#fefae0] shadow-sm">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+              <span>Save Reading to Table</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Observation Section -->
+    <section class="space-y-6 pt-4">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[#557327] mb-1">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+            <span>Field Observations</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-[#233217] dark:text-[#fefae0]">Wind Speed vs. Blade Rotation</h3>
+          <p class="text-xs sm:text-sm text-[#557327] dark:text-[#a5c9be] mt-0.5">Recorded tests showing how wind velocity changes how fast the windmill turns.</p>
+        </div>
+        <button onclick="exportCSV()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono bg-[#7a9a3b] text-[#fefae0] shadow-sm">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Export CSV</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-5 bento-card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-bold text-[#233217] dark:text-[#fefae0]">Speed Curve</h4>
+            <span class="text-[10px] font-mono text-[#7a9a3b]">Wind vs RPM</span>
+          </div>
+          <div class="w-full h-56 relative flex items-center justify-center">
+            <svg id="chart-svg" viewBox="0 0 360 220" class="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="artGreenChartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stop-color="#7a9a3b" stop-opacity="0.4" />
+                  <stop offset="95%" stop-color="#7a9a3b" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <line x1="40" y1="30" x2="340" y2="30" stroke="rgba(122,154,59,0.2)" stroke-dasharray="3 3" />
+              <line x1="40" y1="75" x2="340" y2="75" stroke="rgba(122,154,59,0.2)" stroke-dasharray="3 3" />
+              <line x1="40" y1="120" x2="340" y2="120" stroke="rgba(122,154,59,0.2)" stroke-dasharray="3 3" />
+              <line x1="40" y1="165" x2="340" y2="165" stroke="rgba(122,154,59,0.2)" stroke-dasharray="3 3" />
+              <line x1="40" y1="190" x2="340" y2="190" stroke="rgba(122,154,59,0.3)" />
+
+              <text x="32" y="34" fill="#557327" font-size="9" text-anchor="end" font-family="Space Mono">140</text>
+              <text x="32" y="124" fill="#557327" font-size="9" text-anchor="end" font-family="Space Mono">60</text>
+              <text x="32" y="193" fill="#557327" font-size="9" text-anchor="end" font-family="Space Mono">0</text>
+
+              <text x="40" y="206" fill="#557327" font-size="9" text-anchor="middle" font-family="Space Mono">0</text>
+              <text x="115" y="206" fill="#557327" font-size="9" text-anchor="middle" font-family="Space Mono">25</text>
+              <text x="220" y="206" fill="#557327" font-size="9" text-anchor="middle" font-family="Space Mono">60</text>
+              <text x="310" y="206" fill="#557327" font-size="9" text-anchor="middle" font-family="Space Mono">90</text>
+
+              <path d="M 40 190 L 115 152 L 220 98 L 310 52 L 340 38 L 340 190 Z" fill="url(#artGreenChartGrad)" />
+              <path d="M 40 190 L 115 152 L 220 98 L 310 52 L 340 38" fill="none" stroke="#7a9a3b" stroke-width="2.5" stroke-linecap="round" />
+              <circle id="chart-live-dot" cx="220" cy="98" r="5" fill="#557327" stroke="#fefae0" stroke-width="2" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bento-card p-4">
+          <h4 class="text-sm font-bold text-[#233217] dark:text-[#fefae0] mb-2">Observation Table</h4>
+          <div class="w-full overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[460px]">
+              <thead>
+                <tr class="border-b border-[#7a9a3b]/20 text-[10px] font-mono uppercase text-[#557327]">
+                  <th class="py-2 px-2">Test No.</th>
+                  <th class="py-2 px-2">Wind Level</th>
+                  <th class="py-2 px-2 text-right">Wind</th>
+                  <th class="py-2 px-2 text-right">Blades</th>
+                  <th class="py-2 px-2">Observation</th>
+                </tr>
+              </thead>
+              <tbody id="obs-tbody" class="divide-y divide-[#7a9a3b]/10 text-xs"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let windSpeed = 60;
+    let isSimulating = true;
+    let isDarkMode = false;
+    let currentAngle = 0;
+    let lastTimestamp = performance.now();
+
+    let observations = [
+      { id: 'Run 1', source: 'Calm', speed: 0, rpm: 0, obs: 'No wind. Sails are at rest.' },
+      { id: 'Run 2', source: 'Breeze', speed: 25, rpm: 33, obs: 'Gentle breeze begins turning sails slowly.' },
+      { id: 'Run 3', source: 'Windy', speed: 60, rpm: 80, obs: 'Smooth, steady rotation under continuous wind.' },
+      { id: 'Run 4', source: 'Gale', speed: 90, rpm: 120, obs: 'Fast rotation with full wind force across sails.' }
+    ];
+
+    function getBladeRPM(speed) {
+      if (!isSimulating || speed === 0) return 0;
+      return Math.round((speed / 60) * 80);
+    }
+
+    function updateUI() {
+      const rpm = getBladeRPM(windSpeed);
+      document.getElementById('readout-windspeed').innerText = windSpeed;
+      document.getElementById('readout-bladerpm').innerText = rpm;
+      document.getElementById('speed-slider').value = windSpeed;
+      document.getElementById('speed-input').value = windSpeed;
+      document.getElementById('header-readout').innerText = `${windSpeed} km/h • ${rpm} RPM`;
+      document.getElementById('speed-pct').innerText = `${windSpeed}%`;
+      document.getElementById('bar-windspeed').style.width = `${windSpeed}%`;
+      const rpmPct = Math.min(100, Math.round((rpm / 133) * 100));
+      document.getElementById('bar-bladerpm').style.width = `${rpmPct}%`;
+      document.getElementById('rpm-level').innerText = rpm > 80 ? 'Fast' : rpm > 30 ? 'Normal' : 'Slow';
+
+      const dur = rpm > 0 ? (60 / rpm).toFixed(2) : 'At rest';
+      document.getElementById('stat-duration').innerText = dur > 0 ? `${dur}s` : 'At rest';
+
+      const condTitle = document.getElementById('condition-title');
+      const motTitle = document.getElementById('motion-title');
+      if (!isSimulating) {
+        condTitle.innerText = 'Paused';
+        motTitle.innerText = 'Brake Engaged';
+      } else if (windSpeed === 0) {
+        condTitle.innerText = 'Calm';
+        motTitle.innerText = 'Stationary';
+      } else if (windSpeed <= 30) {
+        condTitle.innerText = 'Gentle Breeze';
+        motTitle.innerText = 'Slow Rotation';
+      } else if (windSpeed <= 70) {
+        condTitle.innerText = 'Steady Wind';
+        motTitle.innerText = 'Smooth Spin';
+      } else {
+        condTitle.innerText = 'Fresh Gale';
+        motTitle.innerText = 'Fast Turning';
+      }
+
+      const power = (!isSimulating || windSpeed === 0) ? 0 : Math.min(2400, Math.round(Math.pow(windSpeed / 100, 2.7) * 2400));
+      document.getElementById('stat-power').innerText = power;
+
+      const dotX = 40 + (windSpeed / 100) * 300;
+      const dotY = 190 - (rpm / 140) * 160;
+      const chartDot = document.getElementById('chart-live-dot');
+      if (chartDot) {
+        chartDot.setAttribute('cx', dotX);
+        chartDot.setAttribute('cy', dotY);
+      }
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        const val = Number(btn.getAttribute('data-value'));
+        if (val === windSpeed) {
+          btn.className = 'preset-btn py-1 px-1 rounded-xl text-center border transition-all bg-[#7a9a3b] text-[#fefae0] border-[#7a9a3b] shadow-sm font-semibold';
+        } else {
+          btn.className = 'preset-btn py-1 px-1 rounded-xl text-center border transition-all bg-[#f4f8d3]/60 dark:bg-[#1b2612]/60 border-[#7a9a3b]/20 text-[#3d5225] dark:text-[#d2e2c5]';
+        }
+      });
+    }
+
+    // Direct continuous rotation via requestAnimationFrame
+    function animateRotor(timestamp) {
+      const dt = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      const rpm = getBladeRPM(windSpeed);
+      if (isSimulating && rpm > 0) {
+        const degPerSec = (rpm / 60) * 360;
+        currentAngle = (currentAngle + degPerSec * dt) % 360;
+        const bladesGroup = document.getElementById('blades-group');
+        if (bladesGroup) {
+          bladesGroup.setAttribute('transform', `rotate(${currentAngle} 200 125)`);
+        }
+      }
+      requestAnimationFrame(animateRotor);
+    }
+
+    function setPreset(speed) {
+      windSpeed = speed;
+      updateUI();
+    }
+
+    function toggleSim(val) {
+      isSimulating = val;
+      const btnStart = document.getElementById('btn-start');
+      const btnStop = document.getElementById('btn-stop');
+      const engineDot = document.getElementById('engine-status-dot');
+
+      if (isSimulating) {
+        btnStart.className = 'flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#7a9a3b]/20 text-[#557327] border border-[#7a9a3b]/30 opacity-70';
+        btnStop.className = 'flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#b56743] hover:bg-[#9e5533] text-white shadow-sm';
+        engineDot.className = 'w-2 h-2 rounded-full bg-[#7a9a3b]';
+      } else {
+        btnStart.className = 'flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#7a9a3b] hover:bg-[#6c8b32] text-[#fefae0] shadow-sm';
+        btnStop.className = 'flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl font-medium text-xs bg-[#b56743]/20 text-[#874323] border border-[#b56743]/30 opacity-70';
+        engineDot.className = 'w-2 h-2 rounded-full bg-stone-400';
+      }
+      updateUI();
+    }
+
+    function resetSimulation() {
+      windSpeed = 60;
+      isSimulating = true;
+      toggleSim(true);
+      updateUI();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('obs-tbody');
+      tbody.innerHTML = '';
+      observations.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#7a9a3b]/10 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2 px-2 font-mono font-bold text-[#7a9a3b]">${item.id}</td>
+          <td class="py-2 px-2 font-medium text-[#233217] dark:text-[#fefae0]">${item.source}</td>
+          <td class="py-2 px-2 text-right font-mono text-[#557327]">${item.speed} km/h</td>
+          <td class="py-2 px-2 text-right font-mono font-semibold">${item.rpm} RPM</td>
+          <td class="py-2 px-2 text-[11px] text-[#3d5225]">${item.obs}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function recordObservation() {
+      const nextNum = observations.length + 1;
+      const rpm = getBladeRPM(windSpeed);
+      observations.push({
+        id: `Run ${nextNum}`,
+        source: windSpeed === 0 ? 'Calm' : windSpeed === 25 ? 'Breeze' : windSpeed === 60 ? 'Windy' : windSpeed === 90 ? 'Gale' : 'Custom',
+        speed: windSpeed,
+        rpm: rpm,
+        obs: !isSimulating ? 'Brake applied.' : `Turning at ${rpm} RPM.`
+      });
+      renderTable();
+    }
+
+    function exportCSV() {
+      const headers = 'Test No,Wind Level,Wind Speed (km/h),Blade Speed (RPM),Observation\n';
+      const rows = observations.map(o => `"${o.id}","${o.source}","${o.speed}","${o.rpm}","${o.obs}"`).join('\n');
+      const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'windmill_observations.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    document.getElementById('speed-slider').addEventListener('input', (e) => {
+      windSpeed = Number(e.target.value);
+      updateUI();
+    });
+
+    document.getElementById('speed-input').addEventListener('input', (e) => {
+      windSpeed = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+      updateUI();
+    });
+
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      isDarkMode = !isDarkMode;
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').outerHTML = '<i data-lucide="sun" id="theme-icon" class="w-4 h-4 text-amber-300"></i>';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-icon').outerHTML = '<i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-[#557327]"></i>';
+      }
+      lucide.createIcons();
+    });
+
+    lucide.createIcons();
+    renderTable();
+    updateUI();
+    requestAnimationFrame(animateRotor);
+  </script>
+</body>
+</html>
